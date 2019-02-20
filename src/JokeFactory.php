@@ -2,30 +2,25 @@
 
 namespace Ashraam\ChuckNorrisJokes;
 
+use GuzzleHttp\Client;
+
 class JokeFactory
 {
-    protected $jokes = [
-        "Chuck Norris peut faire des ronds avec une equerre",
-        "Chuck Norris peut écrire un traitement de texte avec la souris.",
-        "Peter Parker a été mordu par une araignée, Clark Kent a été mordu par Chuck Norris",
-        "Chuck Norris peut dire Schwarzkopf en verlan.",
-        "Chuck Norris a déjà tabassé l homme invisible parce qu il lui gâchait la vue"
-    ];
+    const API_ENDPOINT = 'http://api.ichdb.com/jokes/random';
 
-    public function __construct(array $jokes = null)
+    protected $client;
+
+    public function __construct(Client $client = null)
     {
-        if ($jokes) {
-            $this->jokes = $jokes;
-        }
+        $this->client = $client ?: new Client;
     }
 
     public function getRandomJoke()
     {
-        return $this->jokes[array_rand($this->jokes)];
-    }
+        $response = $this->client->get(self::API_ENDPOINT);
 
-    public function allJokes()
-    {
-        return $this->jokes;
+        $body = json_decode($response->getBody()->getContents());
+
+        return $body->value->joke;
     }
 }
